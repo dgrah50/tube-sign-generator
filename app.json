@@ -1,0 +1,17 @@
+{
+  "name": "Tube Sign Generator",
+  "description": "A web application that creates custom London Underground-style service information signs.",
+  "repository": "https://github.com/dgrah50/tube-sign-generator",
+  "keywords": ["python", "flask", "pillow", "image-generation"],
+  "env": {
+    "FLASK_ENV": {
+      "description": "Environment to run Flask in",
+      "value": "production"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}

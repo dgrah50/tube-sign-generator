@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Service Information Sign Maker</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+      .form-container {
+        flex: 1;
+        min-width: 300px;
+      }
+      .preview-container {
+        flex: 1;
+        min-width: 300px;
+        text-align: center;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .preview-image {
+        max-width: 100%;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+      }
+      .loading {
+        color: #888;
+        font-style: italic;
+      }
+      select {
+        width: 100%;
+        padding: 5px;
+        margin-bottom: 10px;
+      }
+      .font-selector {
+        margin-bottom: 15px;
+        padding: 8px;
+        background: #f5f5f5;
+        border-radius: 5px;
+      }
+      .footer {
+        margin-top: 40px;
+        color: #666;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Service Information Sign Maker</h2>
+    <p>
+      Edit the fields below to create your custom sign. The preview updates as
+      you type.
+    </p>
+
+    <div class="container">
+      <div class="form-container">
+        <form id="signForm" method="get" action="/image.png">
+          <div class="font-selector">
+            <label
+              >Select Font Style:
+              <select name="font" id="font-select">
+                {{ font_options|safe }}
+              </select>
+            </label>
+          </div>
+          <label>Date: <input type="text" name="date" id="date" /></label>
+          <label>Time: <input type="text" name="time" id="time" /></label>
+          <label
+            >Line 1: <input type="text" name="text[first]" id="line1"
+          /></label>
+          <label
+            >Line 2: <input type="text" name="text[second]" id="line2"
+          /></label>
+          <label
+            >Line 3: <input type="text" name="text[third]" id="line3"
+          /></label>
+          <label
+            >Line 4: <input type="text" name="text[fourth]" id="line4"
+          /></label>
+          <label
+            >Line 5: <input type="text" name="text[fifth]" id="line5"
+          /></label>
+          <label
+            >Line 6: <input type="text" name="text[sixth]" id="line6"
+          /></label>
+          <label
+            >Line 7: <input type="text" name="text[seventh]" id="line7"
+          /></label>
+          <label
+            >Line 8: <input type="text" name="text[eighth]" id="line8"
+          /></label>
+          <label
+            >Line 9: <input type="text" name="text[ninth]" id="line9"
+          /></label>
+          <input type="submit" value="Download Full Size Image" />
+        </form>
+      </div>
+
+      <div class="preview-container">
+        <h3>Live Preview</h3>
+        <div id="preview">
+          <div class="loading">Preview will appear here as you type...</div>
+          <img
+            id="previewImage"
+            class="preview-image"
+            src=""
+            style="display: none"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>All images are generated on-demand and not stored on the server.</p>
+    </div>
+
+    <script>
+      // Debounce function to limit how often the preview updates
+      function debounce(func, wait) {
+        let timeout;
+        return function () {
+          const context = this,
+            args = arguments;
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+      }
+
+      // Function to update the preview
+      function updatePreview() {
+        const form = document.getElementById("signForm");
+        const previewImage = document.getElementById("previewImage");
+        const loading = document.querySelector(".loading");
+
+        // Show loading message, hide the current preview
+        loading.style.display = "block";
+        previewImage.style.display = "none";
+
+        // Collect form data
+        const formData = new FormData(form);
+
+        // Convert FormData to query string
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+          params.append(key, value);
+        }
+
+        // Add a cache-busting parameter to avoid browser caching
+        params.append("t", new Date().getTime());
+
+        // Set the src attribute with the new URL
+        previewImage.src = "/preview?" + params.toString();
+
+        // When the image loads, show it and hide the loading message
+        previewImage.onload = function () {
+          loading.style.display = "none";
+          previewImage.style.display = "block";
+        };
+
+        // If there's an error loading the image, show the loading message
+        previewImage.onerror = function () {
+          loading.textContent = "Error loading preview. Please try again.";
+          loading.style.display = "block";
+          previewImage.style.display = "none";
+        };
+      }
+
+      // Add event listeners to all form inputs and the font select
+      const inputs = document.querySelectorAll(
+        '#signForm input[type="text"], #font-select'
+      );
+      const debouncedUpdate = debounce(updatePreview, 300);
+
+      inputs.forEach((input) => {
+        input.addEventListener("input", debouncedUpdate);
+        if (input.tagName === "SELECT") {
+          input.addEventListener("change", debouncedUpdate);
+        }
+      });
+
+      // Initial preview when the page loads
+      window.addEventListener("load", updatePreview);
+    </script>
+  </body>
+</html>
