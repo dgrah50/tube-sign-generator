@@ -4,7 +4,7 @@ Create London Underground-inspired service update signs from the browser.
 
 This project is a Flask + Pillow web app that takes custom text, date/time values, and handwriting-style font choices, then renders a downloadable PNG sign in memory (no generated files are persisted on the server).
 
-![Tube sign example](app/static/images/tube_sign2.png)
+![Generated tube sign example](app/static/images/tube_sign_example.png)
 
 ## Features
 
