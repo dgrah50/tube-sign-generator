@@ -1,145 +1,98 @@
 # Tube Sign Generator
 
-A web application that creates custom London Underground-style service information signs. 
-Users can add text, customize dates/times, and select different fonts to create unique signs.
+Create London Underground-inspired service update signs from the browser.
+
+This project is a Flask + Pillow web app that takes custom text, date/time values, and handwriting-style font choices, then renders a downloadable PNG sign in memory (no generated files are persisted on the server).
+
+![Tube sign example](app/static/images/tube_sign2.png)
 
 ## Features
 
-- Create custom tube-style service information signs
-- Add date and time information 
-- Up to 9 lines of customizable text
-- Multiple font options
-- Live preview as you type
-- Download generated images at full resolution
-- Memory-efficient: no images are stored on the server
+- Generate a custom tube-style sign image from form input
+- Support up to 9 text lines plus optional date and time
+- Live preview while editing
+- Multiple bundled handwriting-style fonts
+- Full-size PNG download
+- Stateless image generation (in-memory response)
 
-## Project Structure
+## Tech Stack
 
-The application follows a standard Python package structure:
+- Python 3.12
+- Flask 3
+- Pillow
+- Gunicorn (production)
 
-```
-tube-sign-generator/
-├── app/                      # Main application package
-│   ├── __init__.py           # Application factory
-│   ├── config/               # Configuration module
-│   │   ├── __init__.py
-│   │   └── settings.py       # Configuration settings
-│   ├── core/                 # Core business logic
-│   │   ├── __init__.py
-│   │   ├── fonts.py          # Font management
-│   │   └── image_generator.py# Image generation
-│   ├── routes/               # Web routes
-│   │   ├── __init__.py
-│   │   └── views.py          # Route handlers
-│   ├── static/               # Static assets
-│   │   ├── fonts/            # Font files
-│   │   └── images/           # Images including tube_sign2.png
-│   └── templates/            # HTML templates
-│       └── index.html        # Main UI template
-├── run.py                    # Main entry point
-├── main.py                   # Backward compatibility entry point
-├── Procfile                  # Heroku deployment configuration
-├── runtime.txt               # Python version for Heroku
-├── app.json                  # Heroku application metadata
-├── requirements.txt          # Project dependencies
-└── README.md                 # This file
-```
+## Quick Start
 
-## Installation
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/tube-sign-generator.git
+1. Clone:
+   ```bash
+   git clone https://github.com/dgrah50/tube-sign-generator.git
    cd tube-sign-generator
    ```
-
-2. Create a virtual environment and activate it:
+2. Create and activate a virtual environment:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
    ```
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
-
 3. Install dependencies:
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
-
-## Running the Application Locally
-
-Start the Flask development server:
-
-```
-python run.py
-```
-
-Or if you prefer to use the original script:
-
-```
-python main.py
-```
-
-Access the application in your web browser at: http://localhost:5000
-
-## Deploying to Heroku
-
-### Option 1: Deploy with Heroku CLI
-
-1. Install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) if you haven't already
-2. Log in to Heroku:
+4. Run locally:
+   ```bash
+   python run.py
    ```
-   heroku login
-   ```
-3. Create a new Heroku app:
-   ```
-   heroku create your-app-name
-   ```
-4. Push your code to Heroku:
-   ```
-   git push heroku main
-   ```
-5. Open your app in a browser:
-   ```
-   heroku open
-   ```
-
-### Option 2: Deploy with Heroku Dashboard
-
-1. Create a new app from the [Heroku Dashboard](https://dashboard.heroku.com/apps)
-2. Connect your GitHub repository or use Heroku Git
-3. Enable automatic deploys or manually deploy
-4. Open your app from the Heroku Dashboard
-
-### Option 3: Deploy with the Deploy to Heroku Button
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+5. Open:
+   `http://localhost:5000`
 
 ## Usage
 
-1. Fill in the form fields with your desired text
-2. Select a font from the dropdown menu
-3. Enter a date and/or time if desired
-4. The preview updates automatically as you type
-5. Click "Download Full Size Image" to get the final PNG file
+1. Open the homepage.
+2. Enter text across the available lines.
+3. Optionally set date and time.
+4. Select a font.
+5. Preview updates automatically.
+6. Download the generated image.
 
-## Development
+## API Endpoints
 
-### Adding New Fonts
+- `GET /` - Main form UI
+- `GET /preview` - Render preview PNG from query parameters
+- `GET /image.png` - Render downloadable full-size PNG from query parameters
 
-To add new fonts:
+## Project Layout
 
-1. Create a new directory in the `app/static/fonts/` folder for your font family
-2. Add the TTF font file(s) to this directory
-3. Restart the application - fonts are discovered automatically
+```text
+tube-sign-generator/
+├── app/
+│   ├── core/                 # Font loading + image generation logic
+│   ├── routes/               # Flask routes and request handling
+│   ├── static/               # Fonts + base sign image
+│   └── templates/            # HTML templates
+├── run.py                    # Local/dev entrypoint
+├── main.py                   # Compatibility entrypoint
+├── Procfile                  # Gunicorn process type (Heroku-style)
+├── app.json                  # Heroku app metadata
+├── requirements.txt
+└── pyproject.toml
+```
 
-## Technical Details
+## Deployment
 
-All images are generated on-demand in memory and served directly to the user. No images are stored on the server, making this application efficient and suitable for environments with limited disk space.
+This repo includes `Procfile`, `runtime.txt`, and `app.json`, so it can be deployed on Heroku-style Python platforms directly.
+
+Example process command:
+
+```bash
+gunicorn "app:create_app()"
+```
+
+## Development Notes
+
+- Fonts are loaded from `app/static/fonts/`.
+- Add a new `.ttf` file under that directory and restart the app to make it available.
+- The root-level `app.py` is legacy; the package app (`app/`) is the active implementation.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgements
-
-- Inspired by London Underground service information signs
-- Uses Flask for the web framework and Pillow for image processing
+No license file is currently included in this repository. Add one (for example, MIT) before distributing or accepting external contributions.
